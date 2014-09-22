@@ -7,7 +7,7 @@ function sshrc() {
             files="$files .sshrc.d"
         fi
         ssh -t "$@" "
-            export SSHHOME=\$(mktemp -d -t .$(whoami).sshrc.XXXX)
+            export SSHHOME=\$(mktemp -d -t .$(whoami).sshrc.XXXX --tmpdir=\$HOME)
             echo $'"$(cat `which sshrc` | xxd -ps)"' | xxd -ps -r > \$SSHHOME/sshrc
             chmod +x \$SSHHOME/sshrc
             echo $'"$( cat << 'EOF' | xxd -ps
