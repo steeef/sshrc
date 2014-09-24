@@ -25,10 +25,6 @@ You can use this to set environment variables, define functions, and run post-lo
 
 Install the [sshrc-git][] AUR package.
 
-### OS X
-
-    $ brew install sshrc
-
 ### Everything else
 
     $ wget https://raw.githubusercontent.com/Russell91/sshrc/master/sshrc
@@ -47,18 +43,27 @@ You can usually tell programs to load their configuration from the $SSHHOME/.ssh
     $ sshrc me@myserver
     $ vim # jk -> normal mode will work
 
-Putting too much data in ~/.sshrc.d will slow down your login times. If the folder contents are > 1MB, the server may start blocking your sshrc attempts.
+Putting too much data in ~/.sshrc.d will slow down your login times. If the folder contents are > 100kB, the server may start blocking your sshrc attempts.
 
 If you use tmux frequently, you can make sshrc work there as well.
 
-    $ echo 'export SHELL=$SSHHOME/bashsshrc
-      alias tmux="tmux -S /tmp/russelltmuxserver"
+    $ echo 'alias tmux="SHELL=$SSHHOME/bashsshrc tmux -S /tmp/russelltmux"
+      export SHELL=`which bash`
       alias foo="echo I work with tmux, too"' > ~/.sshrc
     $ sshrc me@myserver
     $ tmux
     $ foo
     I work with tmux, too
 
-After the SHELL variable is set, any new tmux server will load your configurations. The -S option will start a separate tmux server at /tmp/russelltmuxserver. Don't try to access the vanilla tmux server when your SHELL environment variable is set: if the server isn't already running, other users will get your configurations with their own sessions.
+When the SHELL variable is set, any new tmux server will load your configurations. The -S option will start a separate tmux server at /tmp/russelltmuxserver. Don't try to access the vanilla tmux server when your SHELL environment variable is set: if the server isn't already running, other users will get your configurations with their own sessions.
+
+### Troubleshooting
+
+See the active issues if you're having a problem. Here are known current issues:
+
+* In rare cases your system may complain when you change your VIM environment variable. You can use `alias vim='vim -u /path/to/.vimrc'` in these cases.
+* xxd must be installed on both your local computer and server. If this is not the case, you can't use the tool. xxd can be installed via `apt-get install vim-common` or `yum install vim-common`
+* Temp files are not deleted during a ssh timeout due to the script being killed with a SIGHUP message before cleanup. This is fixed in master.
+* Finally, if the tool is hanging or giving errors about argument strings, you'll most likely need to reduce the size of your .sshrc.d directory. To debug the directory size, use `tar cz -h -C ~ .sshrc .sshrc.d | wc -c`
 
 [sshrc-git]: https://aur.archlinux.org/packages/sshrc-git
